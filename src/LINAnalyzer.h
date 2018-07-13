@@ -7,7 +7,7 @@
 #include "LINChecksum.h"
 
 class LINAnalyzerSettings;
-class ANALYZER_EXPORT LINAnalyzer : public Analyzer2
+class LINAnalyzer : public Analyzer2
 {
 public:
 	LINAnalyzer();
