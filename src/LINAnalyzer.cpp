@@ -2,6 +2,36 @@
 #include "LINAnalyzerSettings.h"
 #include <AnalyzerChannelData.h>
 #include <math.h>
+#include <unordered_map>
+namespace
+{
+    std::unordered_map<LINAnalyzerResults::tLINFrameState, std::string> FrameTypeStringLookup = {
+        { LINAnalyzerResults::NoFrame, "NoFrame" },           { LINAnalyzerResults::headerBreak, "HeaderBreak" },
+        { LINAnalyzerResults::headerSync, "HeaderSync" },     { LINAnalyzerResults::headerPID, "HeaderPID" },
+        { LINAnalyzerResults::responseDataZero, "Data" },     { LINAnalyzerResults::responseData, "Data" },
+        { LINAnalyzerResults::responseChecksum, "Checksum" }, { LINAnalyzerResults::responsePotentialChecksum, "DataOrChecksum" },
+    };
+
+    std::string FrameTypeToString( LINAnalyzerResults::tLINFrameState state )
+    {
+        return FrameTypeStringLookup.at( state );
+    }
+
+    std::vector<std::string> FrameFlagsToString( U8 flags )
+    {
+        std::vector<std::string> strings;
+        if( flags & LINAnalyzerResults::byteFramingError )
+            strings.push_back( "byteFramingError" );
+        if( flags & LINAnalyzerResults::headerBreakExpected )
+            strings.push_back( "headerBreakExpected" );
+        if( flags & LINAnalyzerResults::headerSyncExpected )
+            strings.push_back( "headerSyncExpected" );
+        if( flags & LINAnalyzerResults::checksumMismatch )
+            strings.push_back( "checksumMismatch" );
+
+        return strings;
+    }
+}
 
 LINAnalyzer::LINAnalyzer()
     : Analyzer2(), mSettings( new LINAnalyzerSettings() ), mSimulationInitilized( false ), mFrameState( LINAnalyzerResults::NoFrame )
@@ -70,6 +100,8 @@ void LINAnalyzer::WorkerThread()
         if( showIBS )
         {
             mResults->AddFrame( ibsFrame );
+            // FrameV2 frame_v2_ibs;
+            // mResults->AddFrameV2( frame_v2_ibs, "InterByteSpace", ibsFrame.mStartingSampleInclusive, ibsFrame.mEndingSampleInclusive );
         }
         ready_to_save = false;
 
@@ -179,6 +211,39 @@ void LINAnalyzer::WorkerThread()
 
 
         mResults->AddFrame( byteFrame );
+        FrameV2 frame_v2;
+        switch( static_cast<LINAnalyzerResults::tLINFrameState>( byteFrame.mType ) )
+        {
+        case LINAnalyzerResults::headerPID:
+            frame_v2.AddInteger( "ProtectedId", byteFrame.mData1 & 0x3F );
+            break;
+        case LINAnalyzerResults::responseDataZero: // expecting first response data byte.
+        case LINAnalyzerResults::responseData:     // expecting response data.
+            frame_v2.AddInteger( "data", byteFrame.mData1 );
+            frame_v2.AddInteger( "index", byteFrame.mData2 - 1 );
+            break;
+        case LINAnalyzerResults::responseChecksum: // expecting checksum.
+            frame_v2.AddInteger( "checksum", byteFrame.mData1 );
+            break;
+        case LINAnalyzerResults::responsePotentialChecksum:
+            // TODO: handle "Possible checksum" case!
+            // I think LIN 2.0 explicitly specifies the message length based on the ID, removing any ambiguity.
+            // for now, assume it's the checksum. We have already validated that the byte value is a valid checksum.
+            frame_v2.AddInteger( "checksum", byteFrame.mData1 );
+            frame_v2.AddInteger( "data", byteFrame.mData1 );
+            frame_v2.AddInteger( "index", byteFrame.mData2 - 1 );
+            break;
+        default:
+            break;
+        }
+        auto flag_strings = FrameFlagsToString( byteFrame.mFlags );
+        for( const auto& flag_string : flag_strings )
+        {
+            frame_v2.AddBoolean( flag_string.c_str(), true );
+        }
+        mResults->AddFrameV2( frame_v2, FrameTypeToString( static_cast<LINAnalyzerResults::tLINFrameState>( byteFrame.mType ) ).c_str(),
+                              byteFrame.mStartingSampleInclusive, byteFrame.mEndingSampleInclusive );
+
         if( ready_to_save )
             mResults->CommitPacketAndStartNewPacket();
         mResults->CommitResults();
