@@ -5,16 +5,16 @@
 
 class LINChecksum
 {
-public:
-	LINChecksum();
-	~LINChecksum();
+  public:
+    LINChecksum();
+    ~LINChecksum();
 
-	void	clear();
-	U8		add( U8 byte );
-	U8		result();
+    void clear();
+    U8 add( U8 byte );
+    U8 result();
 
-private:
-	U16 mChecksum;
+  private:
+    U16 mChecksum;
 };
 
 #endif // LINCHECKSUM_H
