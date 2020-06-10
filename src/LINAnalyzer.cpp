@@ -2,10 +2,10 @@
 #include "LINAnalyzerSettings.h"
 #include <AnalyzerChannelData.h>
 #include <math.h>
-#include <unordered_map>
+#include <map>
 namespace
 {
-    std::unordered_map<LINAnalyzerResults::tLINFrameState, std::string> FrameTypeStringLookup = {
+    std::map<LINAnalyzerResults::tLINFrameState, std::string> FrameTypeStringLookup = {
         { LINAnalyzerResults::NoFrame, "NoFrame" },           { LINAnalyzerResults::headerBreak, "HeaderBreak" },
         { LINAnalyzerResults::headerSync, "HeaderSync" },     { LINAnalyzerResults::headerPID, "HeaderPID" },
         { LINAnalyzerResults::responseDataZero, "Data" },     { LINAnalyzerResults::responseData, "Data" },
