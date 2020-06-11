@@ -6,10 +6,10 @@
 namespace
 {
     std::map<LINAnalyzerResults::tLINFrameState, std::string> FrameTypeStringLookup = {
-        { LINAnalyzerResults::NoFrame, "NoFrame" },           { LINAnalyzerResults::headerBreak, "HeaderBreak" },
-        { LINAnalyzerResults::headerSync, "HeaderSync" },     { LINAnalyzerResults::headerPID, "HeaderPID" },
-        { LINAnalyzerResults::responseDataZero, "Data" },     { LINAnalyzerResults::responseData, "Data" },
-        { LINAnalyzerResults::responseChecksum, "Checksum" }, { LINAnalyzerResults::responsePotentialChecksum, "DataOrChecksum" },
+        { LINAnalyzerResults::NoFrame, "no_frame" },          { LINAnalyzerResults::headerBreak, "header_break" },
+        { LINAnalyzerResults::headerSync, "header_sync" },    { LINAnalyzerResults::headerPID, "header_pid" },
+        { LINAnalyzerResults::responseDataZero, "data" },     { LINAnalyzerResults::responseData, "data" },
+        { LINAnalyzerResults::responseChecksum, "checksum" }, { LINAnalyzerResults::responsePotentialChecksum, "data_or_checksum" },
     };
 
     std::string FrameTypeToString( LINAnalyzerResults::tLINFrameState state )
@@ -21,13 +21,13 @@ namespace
     {
         std::vector<std::string> strings;
         if( flags & LINAnalyzerResults::byteFramingError )
-            strings.push_back( "byteFramingError" );
+            strings.push_back( "byte_framing_error" );
         if( flags & LINAnalyzerResults::headerBreakExpected )
-            strings.push_back( "headerBreakExpected" );
+            strings.push_back( "header_break_expected" );
         if( flags & LINAnalyzerResults::headerSyncExpected )
-            strings.push_back( "headerSyncExpected" );
+            strings.push_back( "header_sync_expected" );
         if( flags & LINAnalyzerResults::checksumMismatch )
-            strings.push_back( "checksumMismatch" );
+            strings.push_back( "checksum_mismatch" );
 
         return strings;
     }
@@ -215,7 +215,7 @@ void LINAnalyzer::WorkerThread()
         switch( static_cast<LINAnalyzerResults::tLINFrameState>( byteFrame.mType ) )
         {
         case LINAnalyzerResults::headerPID:
-            frame_v2.AddInteger( "ProtectedId", byteFrame.mData1 & 0x3F );
+            frame_v2.AddInteger( "protected_id", byteFrame.mData1 & 0x3F );
             break;
         case LINAnalyzerResults::responseDataZero: // expecting first response data byte.
         case LINAnalyzerResults::responseData:     // expecting response data.
