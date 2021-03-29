@@ -59,7 +59,7 @@ void LINSimulationDataGenerator::CreateBadFrame()
     U8 identifier = CreateHeader();
     bool classic_identifier = false;
     if( identifier == 0x3C || identifier == 0x3D )
-        classic_identifier == true;
+        classic_identifier = true;
 
     if( mSettings->mLINVersion < 2 || classic_identifier == true )
         mChecksum.clear(); // Version 1 starts chksum at first data byte.

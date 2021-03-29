@@ -155,7 +155,6 @@ void LINAnalyzerResults::GenerateExportFile( const char* file, DisplayBase displ
     U64 num_frames = GetNumFrames();
     for( U64 i = 0; i < num_frames; i++ )
     {
-        U64 j;
         Frame frame = GetFrame( i );
 
         if( frame.mType == headerBreak )
