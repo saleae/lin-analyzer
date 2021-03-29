@@ -113,7 +113,7 @@ void LINAnalyzer::WorkerThread()
 					bool classic_identifier = false;
 					U8 identifier = byteFrame.mData1 & 0x3F;
 					if( identifier == 0x3C || identifier == 0x3D )
-						classic_identifier == true;
+						classic_identifier = true;
 
 					mChecksum.clear();
 					if( mSettings->mLINVersion >= 2 && classic_identifier == false )
