@@ -37,6 +37,7 @@ LINAnalyzer::LINAnalyzer()
     : Analyzer2(), mSettings( new LINAnalyzerSettings() ), mSimulationInitilized( false ), mFrameState( LINAnalyzerResults::NoFrame )
 {
     SetAnalyzerSettings( mSettings.get() );
+    UseFrameV2();
 }
 
 LINAnalyzer::~LINAnalyzer()
