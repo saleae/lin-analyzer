@@ -1,7 +1,6 @@
 #include "LINChecksum.h"
 
-LINChecksum::LINChecksum()
-: mChecksum(0)
+LINChecksum::LINChecksum() : mChecksum( 0 )
 {
 }
 
@@ -11,24 +10,23 @@ LINChecksum::~LINChecksum()
 
 void LINChecksum::clear()
 {
-	mChecksum = 0;
+    mChecksum = 0;
 }
 
-U8 LINChecksum::add(U8 byte)
+U8 LINChecksum::add( U8 byte )
 {
-	mChecksum += byte;
-	if( mChecksum >= 256 )
-		mChecksum -= 255;
+    mChecksum += byte;
+    if( mChecksum >= 256 )
+        mChecksum -= 255;
 
-	//if ( mChecksum & 0x100 ) // carry?
-	//	mChecksum += 1;
-	return (U8)( mChecksum & 0xFF );
+    // if ( mChecksum & 0x100 ) // carry?
+    //	mChecksum += 1;
+    return ( U8 )( mChecksum & 0xFF );
 }
 
 U8 LINChecksum::result()
 {
-	U8 rc = (U8)( mChecksum & 0xFF );
-	rc = ~rc;
-	return rc;
+    U8 rc = ( U8 )( mChecksum & 0xFF );
+    rc = ~rc;
+    return rc;
 }
-
